@@ -10,7 +10,19 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    _instanceof:
+        App\Shared\Domain\Bus\Event\DomainEventSubscriber:
+            tags: [ 'app.domain_event_subscriber', 'messenger.message_handler' ]
+        App\Shared\Domain\Bus\Command\CommandHandler:
+            tags: [ 'app.command_handler' ]
+            lazy: true
 
+        App\Shared\Domain\Bus\Query\QueryHandler:
+            tags: [ 'app.query_handler' ]
+            lazy: true
+        App\Shared\Domain\Bus\Event\DomainEvent:
+            tags: [ 'app.domain_event' ]
+            autowire: false
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -18,3 +30,35 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Contexts\Blog\Author\Domain\AuthorRepository: '@App\Contexts\Blog\Author\Infrastructure\Persistence\AuthorDoctrineRepository'
+    App\Shared\Domain\Bus\Event\EventBus: '@App\Shared\Infrastructure\Bus\Event\SymfonyMessengerEventBus'
+    App\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus:
+        autoconfigure: false
+        arguments:
+            $commandHandlers: !tagged_iterator app.command_handler
+        calls:
+            - bus: [ ]
+    App\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus:
+        autoconfigure: false
+        arguments: [ !tagged_iterator app.query_handler ]
+        calls:
+            - bus: [ ]
+    App\Shared\Infrastructure\Http\Transformer\JsonExceptionTransformerListener:
+        arguments:
+            $debug: '%kernel.debug%'
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException, priority: 100 }
+    App\Shared\Infrastructure\Http\Transformer\HttpExceptionTransformerListener:
+        arguments:
+            $debug: '%kernel.debug%'
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException, priority: 100 }
+
+when@test:
+    services:
+        App\Contexts\Blog\Author\Infrastructure\Persistence\AuthorDoctrineRepository:
+            autowire: true
+            public: true
+        App\Contexts\Blog\Post\Infrastructure\Persistence\PostDoctrineRepository:
+            autowire: true
+            public: true
