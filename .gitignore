@@ -13,3 +13,6 @@
 /phpunit.xml
 /.phpunit.cache/
 ###< phpunit/phpunit ###
+.bash_history
+.idea
+.composer

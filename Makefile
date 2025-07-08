@@ -2,7 +2,7 @@ current-dir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 docker-dir := $(current-dir)docker/
 
 .PHONY: onboard
-onboard: | setup docker-start composer-install
+onboard: | setup docker-start composer-install migrations
 
 .PHONY: setup
 setup: | init
@@ -59,4 +59,12 @@ phpstorm-coverage-folder:
 	@docker compose exec -u root php-fpm bash -c "mkdir -p /opt/phpstorm-coverage"
 	@docker compose exec -u root php-fpm bash -c "chown -R www-data:www-data /opt/phpstorm-coverage"
 	@echo "👌 coverage folder created!"
+	@echo "";
+
+.PHONY: migrations
+migrations:
+	@echo "🐘📦 running migrations"
+	@docker compose exec -u www-data php-fpm bash -c "php bin/console doctrine:database:create --if-not-exists"
+	@docker compose exec -u www-data php-fpm bash -c "php bin/console doctrine:migrations:migrate --no-interaction"
+	@echo "👌 migrations executed!"
 	@echo "";

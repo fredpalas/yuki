@@ -64,6 +64,8 @@ authors.
 
 ### API Documentation and Examples
 
+Base URL: `http://localhost:8080`
+
 Method: `POST /author`
 **Payload:**
 
