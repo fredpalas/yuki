@@ -111,7 +111,16 @@ Response: 201
 }
 ```
 
-Method: `GET /posts/:id`
+Method: `GET /posts/:id.:format`
+**Path Parameter:**
+```plaintext
+:id - The ID of the post to retrieve
+```
+```plaintext
+:format - The format of the response, can be `json` or `xml`
+```
+**Example Request:**
+Route: `/posts/f1c8b2d3-4e5f-4a6b-8c9d-0e1f2g3h4i5j.json`
 **Response:** 
 
 ```json
@@ -123,6 +132,17 @@ Method: `GET /posts/:id`
     "authorId": "0197e952-9dd7-72bb-b6bb-46f88fe4f4bd",
     "authorName": "John Doe"
 }
+```
+Route: `/posts/f1c8b2d3-4e5f-4a6b-8c9d-0e1f2g3h4i5j.xml`
+```xml
+<post>
+    <id>f1c8b2d3-4e5f-4a6b-8c9d-0e1f2g3h4i5j</id>
+    <title>My First Post</title>
+    <description>This is a description of my first post.</description>
+    <content>This is the content of my first post.</content>
+    <authorId>0197e952-9dd7-72bb-b6bb-46f88fe4f4bd</authorId>
+    <authorName>John Doe</authorName>
+</post>
 ```
 
 Method: `PUT /author/:id`
@@ -148,3 +168,5 @@ This handling is done by:
 - `UpdatePostAuthorNameOnAuthorSurnameChange`
 
 We search all the posts of the author and update the author name and surname on the post.
+
+XML and JSON formats are supported for the response of the `GET /posts/:id.:format` endpoint.
